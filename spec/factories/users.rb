@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # == Schema Information
 #
 # Table name: users
@@ -28,23 +26,10 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
-class User < ActiveRecord::Base
-  has_many :articles, dependent: :destroy
-  has_many :comments, dependent: :destroy
-  has_one :likes, dependent: :destroy
-
-  # validation
-  validates :user, presence: true
-
-  validates :user, uniqueness: true
-
-  validates :user, length: { minimum: 2 }
-
-  extend Devise::Models
-
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable, :trackable,
-         :recoverable, :rememberable, :validatable
-  include DeviseTokenAuth::Concerns::User
+FactoryBot.define do
+  factory :user do
+  sequence(:user) {|n| "#{n}_#{Faker::Name.name}"}
+  sequence(:email) {|n| "#{n}_#{Faker::Internet.email}"}
+  password {Faker::Internet.password}
+  end
 end

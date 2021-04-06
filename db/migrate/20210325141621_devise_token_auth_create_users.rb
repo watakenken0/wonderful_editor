@@ -13,7 +13,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.datetime :reset_password_sent_at
       t.boolean  :allow_password_change, default: false
 
-    # ここを追記 --------------------------------------------
+      # ここを追記 --------------------------------------------
       ## Trackable
       t.integer  :sign_in_count, default: 0, null: false
       t.datetime :current_sign_in_at
@@ -48,8 +48,6 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
-
-
 
     # add_index :users, :email,                unique: true
     # add_index :users, [:uid, :provider],     unique: true

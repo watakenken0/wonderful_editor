@@ -23,6 +23,6 @@ class Comment < ApplicationRecord
   belongs_to :user
   belongs_to :article
 
-#validation
-validates :comment, presence: true
+  # validation
+  validates :comment, presence: true
 end
