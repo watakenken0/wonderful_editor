@@ -10,7 +10,7 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 erd.pdf
-
+config/initializers/active_model_serializers.rb
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*

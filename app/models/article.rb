@@ -25,5 +25,4 @@ class Article < ApplicationRecord
   # validation
   validates :title, :content, presence: true
   validates :content, length: { maximum: 2000 }
-  validates :title, uniqueness: true
 end
