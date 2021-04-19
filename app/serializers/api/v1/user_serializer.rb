@@ -26,46 +26,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
-require "rails_helper"
-
-RSpec.describe User, type: :model do
-  fcontext "emailとpasswordに漏れがない場合かつuser（名前）が二文字以上なら" do
-    let(:user) {create(:user)}
-      binding.pry
-    fit "アカウントが作成される" do
-      expect(user).to be_valid
-    end
-  end
-
-  context "userが空欄だった場合" do
-    let(:user) {build(:user, user: nil,)}
-    it "アカウントが作成されない" do
-    end
-  end
-
-  context "名前のみ入力している場合" do
-    let(:user) { build(:user, email: nil, password: nil) }
-
-    it "エラーが発生する" do
-      binding.pry
-      expect(user).not_to be_valid
-    end
-  end
-
-  context "email がない場合" do
-    let(:user) { build(:user, email: nil) }
-
-    it "エラーが発生する" do
-      expect(user).not_to be_valid
-    end
-  end
-
-  context "password がない場合" do
-    let(:user) { build(:user, password: nil) }
-
-    it "エラーが発生する" do
-      expect(user).not_to be_valid
-    end
-  end
-
+class Api::V1::UserSerializer < ActiveModel::Serializer
+  attributes :id, :user, :email
 end
