@@ -46,5 +46,60 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
+  describe "POST /articles" do
+    subject { post(api_v1_articles_path, params: params) }
+
+    let(:params) { { article: attributes_for(:article) } }
+    let(:current_user) { create(:user) }
+
+
+    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
+    fit "記事のレコードが作成できる" do
+      expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
+      res = JSON.parse(response.body)
+      expect(res["title"]).to eq params[:article][:title]
+      expect(res["body"]).to eq params[:article][:body]
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+    describe "PATCH/article/id" do
+     subject{ patch(api_v1_article_path(article_id),params: params)}
+      binding.pry
+     let(:params)  { { article: {title:Faker::Name.name, created_at: 1.day.ago } } }
+     let(:article_id) {article.id}
+     let(:title) {article.title}
+     #articleのデータにuserを紐付けする方法は↓
+     let(:article) {create(:article, user: current_user)}
+     let(:current_user) {create(:user)}
+     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
+     context "自分が所持している記事のレコードを更新しようとしたとき" do
+      fit "レコードを更新できる" do
+        binding.pry
+      expect{subject}.to change {Article.find(article_id).title}.from(article.title).to(params[:article][:title])&
+                              not_change{ Article.find(article_id).created_at}&
+                              not_change{ Article.find(article_id).content}
+      end
+end
+end
+
+    describe "DELETE/articles/id" do
+      subject {delete(api_v1_article_path(article_id),params: params)}
+      let(:article_id) {article.id}
+      let(:params) { { article: attributes_for(:article) } }
+      let!(:article) {create(:article, user: current_user)}
+      let(:current_user) {create(:user)}
+      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+       context "任意のユーザーの記事を削除しようとしたとき" do
+
+        fit "削除できる" do
+        expect{subject}.to change {Article.count}.by (-1)
+
+      end
+    end
+  end
+
 
 end
