@@ -83,7 +83,16 @@ RSpec.describe "Api::V1::Articles", type: :request do
                               not_change{ Article.find(article_id).content}
       end
 end
+context "自分が所持していない記事のレコードを更新しようとするとき" do
+  let(:other_user) { create(:user) }
+  let!(:article) { create(:article, user: other_user) }
+
+  it "更新できない" do
+    expect { subject }.to raise_error(ActiveRecord::RecordNotFound) &
+                          change { Article.count }.by(0)
 end
+end
+
 
     describe "DELETE/articles/id" do
       subject {delete(api_v1_article_path(article_id),params: params)}

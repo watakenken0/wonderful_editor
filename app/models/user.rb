@@ -15,6 +15,7 @@
 #  encrypted_password     :string           default(""), not null
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
+#  name                   :string
 #  password               :string
 #  provider               :string           default("email"), not null
 #  remember_created_at    :datetime
@@ -24,7 +25,6 @@
 #  tokens                 :json
 #  uid                    :string           default("password"), not null
 #  unconfirmed_email      :string
-#  user                   :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
@@ -34,11 +34,11 @@ class User < ActiveRecord::Base
   has_many :likes, dependent: :destroy
 
   # validation
-  validates :user, presence: true
+  validates :name, presence: true
 
-  validates :user, uniqueness: true
+  validates :name, uniqueness: true
 
-  validates :user, length: { minimum: 2 }
+  validates :name, length: { minimum: 2 }
 
   extend Devise::Models
 
