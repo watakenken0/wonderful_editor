@@ -17,7 +17,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
       expect(response).to have_http_status(:ok)
       expect(res["articles"].length).to eq 3
       expect(res["articles"][0].keys).to eq ["title", "updated_at", "user"]
-      expect(res["articles"][0]["user"].keys).to eq ["id", "user", "email"]
+      expect(res["articles"][0]["user"].keys).to eq ["id", "name", "email"]
     end
   end
 
@@ -31,7 +31,6 @@ RSpec.describe "Api::V1::Articles", type: :request do
       it "記事の詳細を表示させる" do
         subject
         res = JSON.parse(response.body)
-        binding.pry
 
         expect(response).to have_http_status(:ok)
         expect(res["article"].keys).to eq ["title", "content", "updated_at", "user_id", "id", "user"]
@@ -39,7 +38,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
 
     context "指定したarticle_idが存在しない時" do
-      let(:article_id) { 1000 }
+      let(:article_id) { 10000 }
       it "記事の詳細を見ることが出来ない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
@@ -52,10 +51,9 @@ RSpec.describe "Api::V1::Articles", type: :request do
     let(:params) { { article: attributes_for(:article) } }
     let(:current_user) { create(:user) }
 
-
     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
-    fit "記事のレコードが作成できる" do
+    it "記事のレコードが作成できる" do
       expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
       res = JSON.parse(response.body)
       expect(res["title"]).to eq params[:article][:title]
@@ -64,51 +62,58 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-    describe "PATCH/article/id" do
-     subject{ patch(api_v1_article_path(article_id),params: params)}
-      binding.pry
-     let(:params)  { { article: {title:Faker::Name.name, created_at: 1.day.ago } } }
-     let(:article_id) {article.id}
-     let(:title) {article.title}
-     #articleのデータにuserを紐付けする方法は↓
-     let(:article) {create(:article, user: current_user)}
-     let(:current_user) {create(:user)}
-     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+  describe "PATCH/article/id" do
+    subject { patch(api_v1_article_path(article_id), params: params) }
 
-     context "自分が所持している記事のレコードを更新しようとしたとき" do
-      fit "レコードを更新できる" do
-        binding.pry
-      expect{subject}.to change {Article.find(article_id).title}.from(article.title).to(params[:article][:title])&
-                              not_change{ Article.find(article_id).created_at}&
-                              not_change{ Article.find(article_id).content}
+    let(:params) { { article: { title: Faker::Name.name, created_at: 1.day.ago } } }
+    let(:article_id) { article.id }
+    let(:title) { article.title }
+    # articleのデータにuserを紐付けする方法は↓
+    let(:article) { create(:article, user: current_user) }
+    let(:current_user) { create(:user) }
+    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
+    context "自分が所持している記事のレコードを更新しようとしたとき" do
+      it "レコードを更新できる" do
+        expect { subject }.to change { Article.find(article_id).title }.from(article.title).to(params[:article][:title]) &
+                              not_change { Article.find(article_id).created_at } &
+                              not_change { Article.find(article_id).content }
       end
-end
-context "自分が所持していない記事のレコードを更新しようとするとき" do
-  let(:other_user) { create(:user) }
-  let!(:article) { create(:article, user: other_user) }
+    end
 
-  it "更新できない" do
-    expect { subject }.to raise_error(ActiveRecord::RecordNotFound) &
-                          change { Article.count }.by(0)
-end
-end
+    context "自分が所持していない記事のレコードを更新しようとするとき" do
+      let(:other_user) { create(:user) }
+      let!(:article) { create(:article, user: other_user) }
 
-
-    describe "DELETE/articles/id" do
-      subject {delete(api_v1_article_path(article_id),params: params)}
-      let(:article_id) {article.id}
-      let(:params) { { article: attributes_for(:article) } }
-      let!(:article) {create(:article, user: current_user)}
-      let(:current_user) {create(:user)}
-      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
-       context "任意のユーザーの記事を削除しようとしたとき" do
-
-        fit "削除できる" do
-        expect{subject}.to change {Article.count}.by (-1)
-
+      it "更新できない" do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound) &
+                              change { Article.count }.by(0)
       end
     end
   end
 
+  describe "DELETE/articles/id" do
+    subject { delete(api_v1_article_path(article_id),params: params) }
+    let(:params) {{article: attributes_for(:article)}}
+    let(:article_id) { article.id }
+    let!(:article) { create(:article, user: current_user) }
+    let(:current_user) { create(:user) }
+    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
+    context "任意のユーザーの記事を削除しようとしたとき" do
+      it "削除できる" do
+        expect { subject }.to change { Article.count }.by(-1)
+      end
+    end
+    #ここは模範回答を参考にした
+    context "他人の所持している記事のレコードを削除しようとするとき" do
+    let!(:other_user) {create(:user)}
+    let(:article) {create(:article, user: other_user)}
+    it "削除することができない" do
+    expect {subject}.to raise_error(ActiveRecord::RecordNotFound)& change {Article.count}.by(0)
+
+    end
+    end
+
+  end
 end
