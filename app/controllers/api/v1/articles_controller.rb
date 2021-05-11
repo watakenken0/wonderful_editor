@@ -25,17 +25,17 @@ module Api::V1
     end
 
     def destroy
-      #対象のレコードを探す
+      # 対象のレコードを探す
       @article = current_user.articles.find(params[:id])
-      #探してきたレコードを削除する
+      # 探してきたレコードを削除する
       @article.destroy!
     end
 
-
     private
-    def article_params
-      binding.pry
-      params.require(:article).permit(:title,:content)
-    end
+
+      def article_params
+        binding.pry
+        params.require(:article).permit(:title, :content)
+      end
   end
 end

@@ -31,19 +31,17 @@ require "rails_helper"
 RSpec.describe User, type: :model do
   context "emailとpasswordに漏れがない場合かつuser（名前）が２文字以上なら" do
     let(:user) { create(:user) }
-    binding.pry
     it "アカウントが作成される" do
       expect(user).to be_valid
     end
   end
 
   context "userが空欄だった場合" do
-    let(:user) { build(:user, user: nil) }
+    let(:user) { build(:user, name: nil) }
     it "アカウントが作成されない" do
-      binding.pry
       expect(user).not_to be_valid
-      expect(user.errors.details[:user][0][:error]).to eq :blank
-      expect(user.errors.details[:user][1][:error]).to eq :too_short
+      expect(user.errors.details[:name][0][:error]).to eq :blank
+      expect(user.errors.details[:name][1][:error]).to eq :too_short
       binding.pry
     end
   end
@@ -52,7 +50,6 @@ RSpec.describe User, type: :model do
     let(:user) { build(:user, email: nil, password: nil) }
 
     it "エラーが発生する" do
-      binding.pry
       expect(user).not_to be_valid
     end
   end

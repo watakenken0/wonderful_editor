@@ -27,5 +27,5 @@
 #  updated_at             :datetime         not null
 #
 class Api::V1::UserSerializer < ActiveModel::Serializer
-  attributes :id, :user, :email
+  attributes :id, :name, :email
 end

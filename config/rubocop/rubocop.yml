@@ -1,3 +1,4 @@
+require: rubocop-rspec
 # 自動生成されるものはチェック対象から除外する
 AllCops:
   Exclude:
@@ -411,4 +412,4 @@ Style/ZeroLengthPredicate:
   Enabled: false
 
 RSpec/LetSetup:
-  Enabled: false
+  Enabled: true
