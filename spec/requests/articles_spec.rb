@@ -46,14 +46,13 @@ RSpec.describe "Api::V1::Articles", type: :request do
   end
 
   describe "POST /articles" do
-    subject { post(api_v1_articles_path, params: params) }
+    subject { post(api_v1_articles_path, params: params, headers: headers) }
 
     let(:params) { { article: attributes_for(:article) } }
     let(:current_user) { create(:user) }
+    let(:headers){ current_user.create_new_auth_token}
 
-    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
-
-    it "記事のレコードが作成できる" do
+    fit "記事のレコードが作成できる" do
       expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
       res = JSON.parse(response.body)
       expect(res["title"]).to eq params[:article][:title]
@@ -63,16 +62,14 @@ RSpec.describe "Api::V1::Articles", type: :request do
   end
 
   describe "PATCH/article/id" do
-    subject { patch(api_v1_article_path(article_id), params: params) }
+    subject { patch(api_v1_article_path(article_id), params: params, headers: headers) }
 
     let(:params) { { article: { title: Faker::Name.name, created_at: 1.day.ago } } }
     let(:article_id) { article.id }
-    let(:title) { article.title }
     # articleのデータにuserを紐付けする方法は↓
     let(:article) { create(:article, user: current_user) }
-    let(:current_user) { create(:user) }
-    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
-
+    let!(:current_user) { create(:user) }
+    let(:headers){ current_user.create_new_auth_token}
     context "自分が所持している記事のレコードを更新しようとしたとき" do
       it "レコードを更新できる" do
         expect { subject }.to change { Article.find(article_id).title }.from(article.title).to(params[:article][:title]) &
@@ -93,15 +90,15 @@ RSpec.describe "Api::V1::Articles", type: :request do
   end
 
   describe "DELETE/articles/id" do
-    subject { delete(api_v1_article_path(article_id),params: params) }
-    let(:params) {{article: attributes_for(:article)}}
+    subject { delete(api_v1_article_path(article_id),headers: headers) }
     let(:article_id) { article.id }
     let!(:article) { create(:article, user: current_user) }
-    let(:current_user) { create(:user) }
-    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+    let!(:current_user) { create(:user) }
+    let(:headers){ current_user.create_new_auth_token}
+
 
     context "任意のユーザーの記事を削除しようとしたとき" do
-      it "削除できる" do
+      fit "削除できる" do
         expect { subject }.to change { Article.count }.by(-1)
       end
     end
