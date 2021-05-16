@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  content    :text
+#  status     :integer
 #  title      :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
@@ -22,5 +23,13 @@ FactoryBot.define do
     title { Faker::Lorem.word }
     content { Faker::Lorem.sentence }
     user
+
+    trait :draft do
+      status { :draft }
+    end
+
+    trait :published do
+      status { :published }
+    end
   end
 end

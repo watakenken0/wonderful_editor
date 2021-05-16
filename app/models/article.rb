@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  content    :text
+#  status     :integer
 #  title      :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
@@ -25,4 +26,6 @@ class Article < ApplicationRecord
   # validation
   validates :title, :content, presence: true
   validates :content, length: { maximum: 2000 }
+
+  enum status: { draft: 0, published: 1 }
 end
