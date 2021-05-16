@@ -2,17 +2,18 @@ module Api::V1
   class ArticlesController < BaseApiController
     before_action :authenticate_user!, only: [:create, :update, :destory]
     def index
-      @articles = Article.order(updated_at: :desc)
-      render json: @articles, each_serializer: Api::V1::ArticlePreviewSerializer
+      @article = Article.where(status: 1)
+      @article = @article.order(updated_at: :desc)
+      render json: @article, each_serializer: Api::V1::ArticlePreviewSerializer
     end
 
     def show
-      @article = Article.find(params[:id])
+      @article = Article.where(status: 1)
+      @article = @article.find(params[:id])
       render json: @article, serializer: Api::V1::ArticleViewSerializer
     end
 
     def create
-      binding.pry
       @article = current_user.articles.create!(article_params)
       render json: @article, each_serializer: Api::V1::ArticleViewSerializer
     end
@@ -26,9 +27,7 @@ module Api::V1
     end
 
     def destroy
-      # 対象のレコードを探す
       @article = current_user.articles.find(params[:id])
-      # 探してきたレコードを削除する
       @article.destroy!
     end
 
@@ -36,7 +35,7 @@ module Api::V1
 
       def article_params
         binding.pry
-        params.require(:article).permit(:title, :content)
+        params.require(:article).permit(:title, :content,:status)
       end
   end
 end

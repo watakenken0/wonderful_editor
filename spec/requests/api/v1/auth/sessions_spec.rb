@@ -40,7 +40,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       let!(:user) {create(:user)}
       let(:params) { {name: user.name, email: user.email, password: "aabbccddee"}}
 
-      fit "ログインできない" do
+      it "ログインできない" do
         binding.pry
         subject
         header = response.header
@@ -68,7 +68,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       context "uid,client,access-tokenのうちどれか一つでも値がない場合" do
         let(:user) {create(:user)}
         let(:headers) { {"uid": "", "client": "", "access-token": ""  }}
-        fit "ログアウトできない" do
+        it "ログアウトできない" do
           binding.pry
           subject
           res = JSON.parse(response.body)
