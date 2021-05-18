@@ -8,10 +8,9 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       let(:params) { {name: user.name, email: user.email, password: user.password}}
 
       it "ログインできる" do
-        binding.pry
         subject
         header = response.header
-        binding.pry
+
         expect(header["access-token"]).to be_present
         expect(header["client"]).to be_present
         expect(header["expiry"]).to be_present
@@ -26,7 +25,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       let(:params) { {name: user.name, email: "abcdefg", password: user.password}}
 
       it "ログインできない" do
-        binding.pry
+
         subject
         header = response.header
         expect(header["access-token"]).not_to be_present
@@ -41,7 +40,6 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       let(:params) { {name: user.name, email: user.email, password: "aabbccddee"}}
 
       it "ログインできない" do
-        binding.pry
         subject
         header = response.header
         expect(header["access-token"]).not_to be_present
@@ -57,8 +55,8 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
       context "ログインしている時" do
         let(:user) {create(:user)}
         let(:headers){ user.create_new_auth_token}
-        fit "ログアウトできる" do
-          binding.pry
+        it "ログアウトできる" do
+
           subject
           res = response.header
           expect(response).to have_http_status(:ok)
@@ -69,7 +67,6 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
         let(:user) {create(:user)}
         let(:headers) { {"uid": "", "client": "", "access-token": ""  }}
         it "ログアウトできない" do
-          binding.pry
           subject
           res = JSON.parse(response.body)
           expect(response).to have_http_status(404)

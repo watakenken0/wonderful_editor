@@ -19,10 +19,8 @@ module Api::V1
     end
 
     def update
-      binding.pry
       @article = current_user.articles.find(params[:id])
       @article.update!(article_params)
-      binding.pry
       render json: @article, each_serializer: Api::V1::ArticleViewSerializer
     end
 
@@ -34,7 +32,6 @@ module Api::V1
     private
 
       def article_params
-        binding.pry
         params.require(:article).permit(:title, :content,:status)
       end
   end
